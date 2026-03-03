@@ -1,0 +1,8 @@
+time="2026-03-03T08:11:53+05:30" level=warning msg="/home/snbhowmik/CODE/CARE/hospital-a/docker-compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Image hospital-a-care-backend-a Building 
+ Image hospital-a-care-frontend-a Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.08kB done
+#1 DONE 0.0s
+unable to prepare context: path "/home/snbhowmik/CODE/CARE/hospital-a/care_be" not found
+

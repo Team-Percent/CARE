@@ -6,28 +6,34 @@ version: "3.8"
 
 services:
   care-backend-a:
-    image: ghcr.io/ohcnetwork/care:latest
+    build:
+      context: ./care_be
+      dockerfile: docker/prod.Dockerfile
     container_name: hospital-a-backend
     ports:
-      - "9000:9000"
+      - "9001:9000"
+    command: bash -c "python3 /app/install_plugins.py && /app/start.sh"
     environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - DJANGO_SECURE_SSL_REDIRECT=False
+      - DJANGO_SESSION_COOKIE_SECURE=False
+      - DJANGO_CSRF_COOKIE_SECURE=False
+      - CORS_ALLOW_ALL_ORIGINS=True
       - DATABASE_URL=postgres://postgres:postgres@db-a:5432/care_a
+      - POSTGRES_DB=care_a
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=db-a
+      - POSTGRES_PORT=5432
       - REDIS_URL=redis://redis-a:6379/0
       - SECRET_KEY=hospital-a-secret-key-change-in-production
-      - ADDITIONAL_PLUGS=care_medgemma
+      - ADDITIONAL_PLUGS=[{"name":"care_medgemma","package_name":"/app/care_medgemma","version":""}]
       - HOSPITAL_ID=HOSP-CITYCARE-A
       - HOSPITAL_NAME=CityCare Multispeciality Hospital
       - UHI_SWITCH_URL=http://uhi-switch.example.com:8080
     volumes:
-      - ../../care_medgemma:/app/care_medgemma
+      - ./care_medgemma:/app/care_medgemma
       - ./patient_data:/app/patient_data
-    deploy:
-      resources:
-        limits:
-          memory: 1g
-          cpus: "1.0"
-        reservations:
-          memory: 512m
     depends_on:
       - db-a
       - redis-a
@@ -37,13 +43,10 @@ services:
     image: ghcr.io/ohcnetwork/care_fe:latest
     container_name: hospital-a-frontend
     ports:
-      - "4000:4000"
+      - "4001:80"
     environment:
-      - REACT_CARE_API_URL=http://localhost:9000
-    deploy:
-      resources:
-        limits:
-          memory: 256m
+      - REACT_CARE_API_URL=http://localhost:9001
+      - NODE_OPTIONS=--max-old-space-size=4096
 
   db-a:
     image: postgres:15-alpine
@@ -55,7 +58,7 @@ services:
     volumes:
       - hospital_a_db:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5434:5432"
     deploy:
       resources:
         limits:
@@ -65,7 +68,7 @@ services:
     image: redis:7-alpine
     container_name: hospital-a-redis
     ports:
-      - "6379:6379"
+      - "6381:6379"
     deploy:
       resources:
         limits:

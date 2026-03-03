@@ -1,0 +1,185 @@
+time="2026-03-03T09:15:00+05:30" level=warning msg="/home/snbhowmik/CODE/CARE/hospital-a/docker-compose.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Image hospital-a-care-backend-a Building 
+ Image hospital-a-care-frontend-a Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.08kB done
+#1 DONE 0.0s
+
+#2 [care-backend-a internal] load build definition from prod.Dockerfile
+#2 transferring dockerfile: 1.91kB done
+#2 DONE 0.0s
+
+#3 [care-frontend-a internal] load build definition from Dockerfile
+#3 transferring dockerfile: 599B done
+#3 WARN: FromAsCasing: 'as' and 'FROM' keywords' casing do not match (line 2)
+#3 WARN: FromAsCasing: 'as' and 'FROM' keywords' casing do not match (line 24)
+#3 DONE 0.0s
+
+#4 [care-backend-a internal] load metadata for docker.io/library/python:3.13-slim-bookworm
+#4 ...
+
+#5 [auth] library/nginx:pull token for registry-1.docker.io
+#5 DONE 0.0s
+
+#6 [auth] library/python:pull token for registry-1.docker.io
+#6 DONE 0.0s
+
+#7 [auth] library/node:pull token for registry-1.docker.io
+#7 DONE 0.0s
+
+#8 [care-frontend-a internal] load metadata for docker.io/library/nginx:stable-alpine
+#8 ...
+
+#4 [care-backend-a internal] load metadata for docker.io/library/python:3.13-slim-bookworm
+#4 DONE 3.8s
+
+#9 [care-backend-a internal] load .dockerignore
+#9 transferring context: 125B done
+#9 DONE 0.0s
+
+#8 [care-frontend-a internal] load metadata for docker.io/library/nginx:stable-alpine
+#8 DONE 3.8s
+
+#10 [care-backend-a base 1/2] FROM docker.io/library/python:3.13-slim-bookworm@sha256:1245b6c39d0b8e49e911c7d07b60cd9ed26016b0e439b6903d5e08730e417553
+#10 resolve docker.io/library/python:3.13-slim-bookworm@sha256:1245b6c39d0b8e49e911c7d07b60cd9ed26016b0e439b6903d5e08730e417553 0.0s done
+#10 DONE 0.0s
+
+#11 [care-backend-a runtime 2/6] RUN apt-get update && apt-get install --no-install-recommends -y   libpq-dev libgmp-dev libpangoft2-1.0-0 gettext wget curl gnupg   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false   && rm -rf /var/lib/apt/lists/*
+#11 CACHED
+
+#12 [care-backend-a runtime 1/6] RUN addgroup --system django   && adduser --system --ingroup django django
+#12 CACHED
+
+#13 [care-backend-a base 2/2] WORKDIR /app
+#13 CACHED
+
+#14 [care-backend-a runtime 3/6] RUN chown django:django /app
+#14 CACHED
+
+#15 [care-frontend-a internal] load metadata for docker.io/library/node:22-bookworm-slim
+#15 DONE 3.9s
+
+#16 [care-frontend-a internal] load .dockerignore
+#16 transferring context: 93B done
+#16 DONE 0.0s
+
+#17 [care-backend-a internal] load build context
+#17 transferring context: 76.51kB 0.1s done
+#17 DONE 0.1s
+
+#18 [care-backend-a builder 3/8] RUN python -m venv /app/.venv
+#18 CACHED
+
+#19 [care-backend-a builder 1/8] RUN apt-get update && apt-get install --no-install-recommends -y   build-essential libjpeg-dev zlib1g-dev libgmp-dev libpq-dev git wget   libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0 libharfbuzz-subset0 libffi-dev libopenjp2-7-dev   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false   && rm -rf /var/lib/apt/lists/*
+#19 CACHED
+
+#20 [care-backend-a builder 2/8] RUN pip install pipenv==2025.1.1
+#20 CACHED
+
+#21 [care-backend-a builder 4/8] COPY Pipfile Pipfile.lock /app/
+#21 CACHED
+
+#22 [care-frontend-a internal] load build context
+#22 transferring context: 95.52kB 0.1s done
+#22 DONE 0.1s
+
+#23 [care-frontend-a build-stage 1/9] FROM docker.io/library/node:22-bookworm-slim@sha256:dd9d21971ec4395903fa6143c2b9267d048ae01ca6d3ea96f16cb30df6187d94
+#23 resolve docker.io/library/node:22-bookworm-slim@sha256:dd9d21971ec4395903fa6143c2b9267d048ae01ca6d3ea96f16cb30df6187d94 0.0s done
+#23 DONE 0.0s
+
+#24 [care-frontend-a production-stage 1/3] FROM docker.io/library/nginx:stable-alpine@sha256:15e96e59aa3b0aada3a121296e3bce117721f42d88f5f64217ef4b18f458c6ab
+#24 resolve docker.io/library/nginx:stable-alpine@sha256:15e96e59aa3b0aada3a121296e3bce117721f42d88f5f64217ef4b18f458c6ab 0.0s done
+#24 CACHED
+
+#25 [care-frontend-a build-stage 3/9] RUN apt-get update && apt-get install -y git
+#25 CACHED
+
+#26 [care-frontend-a build-stage 7/9] RUN npm run postinstall
+#26 CACHED
+
+#27 [care-frontend-a build-stage 5/9] RUN npm install --ignore-scripts
+#27 CACHED
+
+#28 [care-frontend-a build-stage 2/9] WORKDIR /app
+#28 CACHED
+
+#29 [care-frontend-a build-stage 4/9] COPY package.json package-lock.json ./
+#29 CACHED
+
+#30 [care-frontend-a build-stage 6/9] COPY . .
+#30 CACHED
+
+#31 [care-frontend-a build-stage 8/9] RUN npm run setup
+#31 CACHED
+
+#32 [care-frontend-a build-stage 9/9] RUN npm run build
+#32 0.969 
+#32 0.969 > care_fe@3.0.5 build
+#32 0.969 > npm run setup && npm run build:meta && npm run supported-browsers && npm run build:react
+#32 0.969 
+#32 1.185 
+#32 1.185 > care_fe@3.0.5 setup
+#32 1.185 > tsx scripts/setup-care-apps.ts
+#32 1.185 
+#32 1.786 Setting up Care plugins...
+#32 1.792 Generated pluginMap.ts
+#32 1.792 Plugin setup complete!
+#32 1.947 
+#32 1.947 > care_fe@3.0.5 build:meta
+#32 1.947 > node ./scripts/generate-build-version.js
+#32 1.947 
+#32 2.147 
+#32 2.147 > care_fe@3.0.5 supported-browsers
+#32 2.147 > node ./scripts/generate-supported-browsers.mjs
+#32 2.147 
+#32 2.230 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+#32 2.548 
+#32 2.548 > care_fe@3.0.5 build:react
+#32 2.548 > cross-env NODE_ENV=production vite build
+#32 2.548 
+#32 5.394 vite v6.4.1 building for production...
+#32 5.535 transforming...
+#32 ...
+
+#33 [care-backend-a builder 5/8] RUN pipenv install --deploy --categories "packages"
+#33 1.848 Installing dependencies from Pipfile.lock (3f5e09)...
+#33 ...
+
+#32 [care-frontend-a build-stage 9/9] RUN npm run build
+#32 65.90 ✓ 6640 modules transformed.
+#32 70.12 rendering chunks...
+#32 ERROR: process "/bin/sh -c npm run build" did not complete successfully: cannot allocate memory
+
+#33 [care-backend-a builder 5/8] RUN pipenv install --deploy --categories "packages"
+#33 CANCELED
+------
+ > [care-frontend-a build-stage 9/9] RUN npm run build:
+2.147 
+2.230 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+2.548 
+2.548 > care_fe@3.0.5 build:react
+2.548 > cross-env NODE_ENV=production vite build
+2.548 
+5.394 vite v6.4.1 building for production...
+5.535 transforming...
+65.90 ✓ 6640 modules transformed.
+70.12 rendering chunks...
+------
+Dockerfile:20
+
+--------------------
+
+  18 |     RUN npm run setup
+
+  19 |     
+
+  20 | >>> RUN npm run build
+
+  21 |     
+
+  22 |     
+
+--------------------
+
+target care-frontend-a: failed to solve: ResourceExhausted: process "/bin/sh -c npm run build" did not complete successfully: cannot allocate memory
+
