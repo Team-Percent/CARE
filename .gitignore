@@ -1,0 +1,45 @@
+# ─── Mobile App (separate repo) ───
+CareConnect/
+
+# ─── Embedded Git Repos (separate repos) ───
+care/
+care_be/
+care_fe/
+care_scribe/
+care-plugin-cookiecutter/
+uhi-switch/
+
+# ─── Python ───
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# ─── Environment ───
+.env
+.env.local
+
+# ─── Database ───
+*.db
+*.sqlite3
+
+# ─── IDE ───
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ─── OS ───
+.DS_Store
+Thumbs.db
+
+# ─── Node ───
+node_modules/
+
+# ─── Gemini ───
+.gemini/

@@ -1,0 +1,75 @@
+version: "3.8"
+
+# Hospital A — CityCare Multispeciality Hospital (Primary)
+# Deploy on PC-1 / internal network 1
+# Contains: Months 1-10 progress reports + CT/X-ray months 1-2
+
+services:
+  care-backend-a:
+    image: ghcr.io/ohcnetwork/care:latest
+    container_name: hospital-a-backend
+    ports:
+      - "9000:9000"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db-a:5432/care_a
+      - REDIS_URL=redis://redis-a:6379/0
+      - SECRET_KEY=hospital-a-secret-key-change-in-production
+      - ADDITIONAL_PLUGS=care_medgemma
+      - HOSPITAL_ID=HOSP-CITYCARE-A
+      - HOSPITAL_NAME=CityCare Multispeciality Hospital
+      - UHI_SWITCH_URL=http://uhi-switch.example.com:8080
+    volumes:
+      - ../../care_medgemma:/app/care_medgemma
+      - ./patient_data:/app/patient_data
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+          cpus: "1.0"
+        reservations:
+          memory: 512m
+    depends_on:
+      - db-a
+      - redis-a
+    restart: unless-stopped
+
+  care-frontend-a:
+    image: ghcr.io/ohcnetwork/care_fe:latest
+    container_name: hospital-a-frontend
+    ports:
+      - "4000:4000"
+    environment:
+      - REACT_CARE_API_URL=http://localhost:9000
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+
+  db-a:
+    image: postgres:15-alpine
+    container_name: hospital-a-db
+    environment:
+      - POSTGRES_DB=care_a
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - hospital_a_db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  redis-a:
+    image: redis:7-alpine
+    container_name: hospital-a-redis
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+volumes:
+  hospital_a_db:

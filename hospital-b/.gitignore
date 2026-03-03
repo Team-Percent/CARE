@@ -1,0 +1,13 @@
+# Environment
+.env
+
+# Docker volumes
+hospital_b_db/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# OS
+.DS_Store
+Thumbs.db

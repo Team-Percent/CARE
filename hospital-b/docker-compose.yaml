@@ -1,0 +1,75 @@
+version: "3.8"
+
+# Hospital B — Metro Radiology & Diagnostics Center (Referral)
+# Deploy on PC-2 / internal network 2
+# Contains: CT/X-ray months 3-8 + baseline chest X-ray image
+
+services:
+  care-backend-b:
+    image: ghcr.io/ohcnetwork/care:latest
+    container_name: hospital-b-backend
+    ports:
+      - "9001:9000"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db-b:5432/care_b
+      - REDIS_URL=redis://redis-b:6379/0
+      - SECRET_KEY=hospital-b-secret-key-change-in-production
+      - ADDITIONAL_PLUGS=care_medgemma
+      - HOSPITAL_ID=HOSP-METRO-B
+      - HOSPITAL_NAME=Metro Radiology & Diagnostics Center
+      - UHI_SWITCH_URL=http://uhi-switch.example.com:8080
+    volumes:
+      - ../../care_medgemma:/app/care_medgemma
+      - ./patient_data:/app/patient_data
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+          cpus: "1.0"
+        reservations:
+          memory: 512m
+    depends_on:
+      - db-b
+      - redis-b
+    restart: unless-stopped
+
+  care-frontend-b:
+    image: ghcr.io/ohcnetwork/care_fe:latest
+    container_name: hospital-b-frontend
+    ports:
+      - "4001:4000"
+    environment:
+      - REACT_CARE_API_URL=http://localhost:9001
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+
+  db-b:
+    image: postgres:15-alpine
+    container_name: hospital-b-db
+    environment:
+      - POSTGRES_DB=care_b
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - hospital_b_db:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  redis-b:
+    image: redis:7-alpine
+    container_name: hospital-b-redis
+    ports:
+      - "6380:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+volumes:
+  hospital_b_db:
