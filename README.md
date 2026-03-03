@@ -34,8 +34,8 @@ A hackathon demo showing how patient health records can be **securely shared bet
 
 ### Step 1: Clone This Repo
 ```bash
-git clone https://github.com/Team-Percent/care-uhi.git
-cd care-uhi
+git clone https://github.com/Team-Percent/CARE.git
+cd CARE
 ```
 
 ### Step 2: UHI Switch (Already Deployed!)

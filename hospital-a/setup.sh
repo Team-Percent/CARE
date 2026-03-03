@@ -8,13 +8,13 @@ echo "═══ Setting Up Hospital A — CityCare Multispeciality ═══"
 # 1. Clone CARE Backend (OHC fork with MedGemma support)
 if [ ! -d "care_be" ]; then
     echo "📦 Cloning CARE Backend..."
-    git clone https://github.com/ohcnetwork/care.git care_be
+    git clone https://github.com/Team-Percent/care_be.git care_be
 fi
 
 # 2. Clone CARE Frontend (OHC fork with MedGemma dashboard)
 if [ ! -d "care_fe" ]; then
     echo "📦 Cloning CARE Frontend..."
-    git clone https://github.com/ohcnetwork/care_fe.git care_fe
+    git clone https://github.com/Team-Percent/care_fe.git care_fe
 fi
 
 # 3. Clone MedGemma Plugin
