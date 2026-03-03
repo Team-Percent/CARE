@@ -37,8 +37,8 @@
 │  │  • Emergency Access        • Bucket Auto-Expiry          │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                               │
-│  Deployed on: Railway / Fly.io / AWS EC2 / Any VPS            │
-│  API Docs: https://your-switch.example.com/docs               │
+│  Deployed on: Railway (LIVE)                                  │
+│  API Docs: https://uhi-switch-production.up.railway.app/docs  │
 └───────────┼───────────────────────────────────────────────────┘
             │
             │  HTTPS (internet)
@@ -116,71 +116,26 @@ curl http://localhost:9001/api/health
 
 ---
 
-## 4. Deploy UHI Switch Server (Internet)
+## 4. UHI Switch Server (Already Deployed!)
 
-### Option A: Local Development
+The UHI Switch is **permanently deployed** on Railway:
 
-```bash
-cd uhi-switch/
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8080 --reload
+| | URL |
+|---|---|
+| **Server** | https://uhi-switch-production.up.railway.app |
+| **API Docs** | https://uhi-switch-production.up.railway.app/docs |
+| **Health** | https://uhi-switch-production.up.railway.app/health |
 
-# API Docs: http://localhost:8080/docs
-```
+**No need to deploy it yourself.** Just use the URLs above.
 
-### Option B: Docker
-
-```bash
-cd uhi-switch/
-docker compose up -d --build
-```
-
-### Option C: Deploy to Internet (Production)
-
-**Railway (Recommended — easiest):**
-```bash
-cd uhi-switch/
-npm install -g @railway/cli
-railway login
-railway init
-railway up
-# → https://your-switch.up.railway.app
-```
-
-**Fly.io:**
-```bash
-cd uhi-switch/
-flyctl launch --name uhi-switch
-flyctl deploy
-# → https://uhi-switch.fly.dev
-```
-
-**AWS EC2 / Any VPS:**
-```bash
-# On the VPS:
-git clone <repo> && cd uhi-switch
-docker compose up -d --build
-
-# Add Nginx reverse proxy:
-sudo apt install nginx certbot
-# Configure HTTPS with Let's Encrypt
-```
-
-**Production Checklist:**
-- [ ] Replace SQLite → PostgreSQL
-- [ ] Enable HTTPS (Nginx + Let's Encrypt)
-- [ ] Set CORS_ORIGINS to hospital domains only
-- [ ] Add rate limiting (Redis-backed)
-- [ ] Set up monitoring (Prometheus + Grafana)
-- [ ] Configure S3 lifecycle policies for auto-deletion
+> To run locally for development, see the [uhi-switch repo](https://github.com/Team-Percent/uhi-switch).
 
 ---
 
 ## 5. Register Hospitals with UHI Switch
 
 ```bash
-UHI=https://your-switch.example.com  # or http://localhost:8080
+UHI=https://uhi-switch-production.up.railway.app
 
 # Register Hospital A
 curl -X POST $UHI/hospital/register \
@@ -216,7 +171,7 @@ S3 bucket             → auto-deleted after expiry (set by Hospital A or patien
 ### Step-by-Step Demo
 
 ```bash
-UHI=http://localhost:8080
+UHI=https://uhi-switch-production.up.railway.app
 
 # ── Step 1: Hospital A encrypts and uploads FHIR bundle to S3 ──
 UPLOAD=$(curl -s -X POST $UHI/storage/upload \
@@ -354,8 +309,8 @@ X-ray:    CTR 52% (borderline) → 46% (optimal) ✅
 | Hospital A Frontend | Internal 1 | 4000 | http://pc1:4000 |
 | Hospital B Backend | Internal 2 | 9001 | http://pc2:9001 |
 | Hospital B Frontend | Internal 2 | 4001 | http://pc2:4001 |
-| UHI Switch | Internet | 8080 | https://your-switch.example.com |
-| Switch API Docs | Internet | 8080 | https://your-switch.example.com/docs |
+| UHI Switch | Internet | 443 | https://uhi-switch-production.up.railway.app |
+| Switch API Docs | Internet | 443 | https://uhi-switch-production.up.railway.app/docs |
 
 ---
 

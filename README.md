@@ -38,16 +38,12 @@ git clone https://github.com/Team-Percent/care-uhi.git
 cd care-uhi
 ```
 
-### Step 2: Deploy UHI Switch (Internet Server)
-```bash
-git clone https://github.com/Team-Percent/uhi-switch.git
-cd uhi-switch
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8080
+### Step 2: UHI Switch (Already Deployed!)
+The UHI Switch is **live** at:
+- 🌐 **Server**: https://uhi-switch-production.up.railway.app
+- 📖 **API Docs**: https://uhi-switch-production.up.railway.app/docs
 
-# API Docs: http://localhost:8080/docs
-```
+No need to deploy it yourself — it's already running on Railway.
 
 ### Step 3: Deploy Hospital A (PC-1)
 ```bash
@@ -71,7 +67,7 @@ chmod +x setup.sh
 
 ### Step 5: Connect Everything
 ```bash
-UHI=http://localhost:8080
+UHI=https://uhi-switch-production.up.railway.app
 
 # Register hospitals
 curl -X POST $UHI/hospital/register -H "Content-Type: application/json" \
