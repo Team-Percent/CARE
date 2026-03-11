@@ -19,6 +19,11 @@ class MedGemmaAnalysis(BaseModel):
         DDI_CHECK = "ddi_check", "Drug-Drug Interaction Check"
         DIFFERENTIAL_DIAGNOSIS = "differential_diagnosis", "Differential Diagnosis Hints"
         SOAP_AUTOFILL = "soap_autofill", "SOAP Note Autofill"
+        # MedGemma presets (from analyzer.py)
+        COMPREHENSIVE = "comprehensive", "Comprehensive Analysis"
+        SUMMARY = "summary", "Clinical Summary"
+        CRITICAL = "critical", "Critical Flags & Alerts"
+        TIMELINE = "timeline", "Medical Timeline"
 
     class Status(models.TextChoices):
         PENDING = "PENDING", "Pending"

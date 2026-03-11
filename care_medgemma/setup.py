@@ -21,8 +21,8 @@ requirements = [
 test_requirements = []
 
 setup(
-    author="Antigravity Team",
-    author_email="info@ohc.network",
+    author="Team-Percent",
+    author_email="connect@snbhowmik.dev",
     python_requires=">=3.10",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
@@ -43,7 +43,7 @@ setup(
     packages=find_packages(include=["care_medgemma", "care_medgemma.*"]),
     test_suite="tests",
     tests_require=test_requirements,
-    url="https://github.com/ohcnetwork/care_medgemma",
+    url="https://github.com/Team-Percent/CARE",
     version="0.1.0",
     zip_safe=False,
 )

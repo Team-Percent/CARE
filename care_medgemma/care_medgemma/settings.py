@@ -77,6 +77,10 @@ DEFAULTS = {
     "MEDGEMMA_MODEL_VERSION": "medgemma-mock-1.0",
     "MEDGEMMA_API_ENDPOINT": "",
     "MEDGEMMA_API_KEY": "",
+    # Ollama local server configuration (for real MedGemma mode)
+    "MEDGEMMA_OLLAMA_HOST": "http://172.19.127.189:11434/api/chat",
+    "MEDGEMMA_OLLAMA_MODEL": "CareAnalyzer",
+    "MEDGEMMA_REQUEST_TIMEOUT": 120,
     # FHIR configuration
     "FHIR_VERSION": "R5",
     "FHIR_BUNDLE_PAGE_SIZE": 50,

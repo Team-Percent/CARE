@@ -43,6 +43,7 @@ class MedGemmaViewSet(
         """
         Submit FHIR data for MedGemma analysis.
         In mock mode, returns realistic structured analysis.
+        In real mode, connects to local Ollama server.
         """
         serializer = MedGemmaRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -50,6 +51,7 @@ class MedGemmaViewSet(
         data = serializer.validated_data
         analysis_type = data["analysis_type"]
         input_data = data.get("input_data", {})
+        preset = data.get("preset", "")
 
         # Resolve encounter if provided
         encounter = None
@@ -66,8 +68,10 @@ class MedGemmaViewSet(
         if is_mock:
             result = mock_medgemma.analyze(analysis_type, input_data)
         else:
-            # In production, this would call the real MedGemma API
-            result = mock_medgemma.analyze(analysis_type, input_data)
+            from care_medgemma import real_medgemma
+            result = real_medgemma.analyze(
+                analysis_type, input_data, preset=preset or None
+            )
 
         # Save analysis record
         analysis = MedGemmaAnalysis.objects.create(
@@ -78,7 +82,7 @@ class MedGemmaViewSet(
             analysis_result=result,
             status=MedGemmaAnalysis.Status.COMPLETED,
             model_version=result.get("model_version", "medgemma-mock-1.0"),
-            is_mock=is_mock,
+            is_mock=result.get("is_mock", is_mock),
             processing_time_ms=result.get("processing_time_ms"),
         )
 
@@ -90,7 +94,8 @@ class MedGemmaViewSet(
             resource_types=[analysis_type],
             metadata={
                 "analysis_id": str(analysis.external_id),
-                "is_mock": is_mock,
+                "is_mock": result.get("is_mock", is_mock),
+                "preset": preset or analysis_type,
                 "ip": request.META.get("REMOTE_ADDR", ""),
             },
         )

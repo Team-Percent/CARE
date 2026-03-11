@@ -51,3 +51,16 @@ class MedGemmaRequestSerializer(serializers.Serializer):
         allow_blank=True,
         default="",
     )
+    preset = serializers.ChoiceField(
+        choices=[
+            ("comprehensive", "Comprehensive Analysis"),
+            ("summary", "Clinical Summary"),
+            ("critical", "Critical Flags & Alerts"),
+            ("timeline", "Medical Timeline"),
+        ],
+        required=False,
+        allow_blank=True,
+        default="",
+        help_text="Optional preset to override the analysis prompt. "
+                  "If not provided, the analysis_type determines the prompt.",
+    )
