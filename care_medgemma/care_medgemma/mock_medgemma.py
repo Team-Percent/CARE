@@ -549,6 +549,40 @@ def analyze(analysis_type, input_data):
 
     processing_time_ms = int((time.time() - start_time) * 1000) + random.randint(200, 800)
 
+    # Extract DocumentReferences attached to the bundle
+    documents_analyzed = []
+    if isinstance(input_data, dict) and input_data.get("resourceType") == "Bundle":
+        for entry in input_data.get("entry", []):
+            res = entry.get("resource", {})
+            if res.get("resourceType") == "DocumentReference":
+                try:
+                    documents_analyzed.append({
+                        "id": res.get("id"),
+                        "title": res.get("content", [{}])[0].get("attachment", {}).get("title", "Document"),
+                        "url": res.get("content", [{}])[0].get("attachment", {}).get("url", "")
+                    })
+                except Exception:
+                    pass
+
+    # For hackathon demo: If the bundle didn't include actual entries but we know it's Devaganesh,
+    # fetch them directly using his ABHA ID so the UI can display the "Source Documents Analyzed"
+    bundle_abha = ""
+    if isinstance(input_data, dict):
+        bundle_abha = str(input_data.get("abha_id", ""))
+    
+    if not documents_analyzed and patient_id == "devaganesh" and bundle_abha:
+        try:
+            from care_medgemma.fhir_utils import get_document_references
+            doc_refs = get_document_references(bundle_abha)
+            for res in doc_refs:
+                documents_analyzed.append({
+                    "id": res.get("id"),
+                    "title": res.get("content", [{}])[0].get("attachment", {}).get("title", "Document"),
+                    "url": res.get("content", [{}])[0].get("attachment", {}).get("url", "")
+                })
+        except Exception as e:
+            print("Error fetching mock documents:", e)
+                    
     return {
         **result,
         "analysis_type": analysis_type,
@@ -557,6 +591,7 @@ def analyze(analysis_type, input_data):
         "model_version": "medgemma-mock-1.0",
         "processing_time_ms": processing_time_ms,
         "request_id": str(uuid.uuid4()),
+        "documents_analyzed": documents_analyzed,
         **({"patient": DEVAGANESH_CLINICAL_DATA["patient"]} if patient_id == "devaganesh" else {}),
     }
 

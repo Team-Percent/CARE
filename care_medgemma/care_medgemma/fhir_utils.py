@@ -200,6 +200,53 @@ def create_medication_request(medication_name, dosage, frequency, status="active
     }
 
 
+def get_document_references(abha_id):
+    """Query the DB for FileUploads associated with the patient's encounters"""
+    try:
+        from django.apps import apps
+        Patient = apps.get_model('emr', 'Patient')
+        Encounter = apps.get_model('emr', 'Encounter')
+        FileUpload = apps.get_model('emr', 'FileUpload')
+        
+        # In our script, Devaganesh was created with simple name matching 
+        # but in production abha_id would be stored in Patient identifier
+        # We try to find the patient by ABHA ID or Name for the demo
+        patient = Patient.objects.filter(name="Devaganesh S").first() 
+        if not patient:
+            return []
+            
+        encounters = Encounter.objects.filter(patient=patient)
+        docs = []
+        
+        for enc in encounters:
+            files = FileUpload.objects.filter(associating_id=str(enc.external_id))
+            for f in files:
+                url = f"/api/v1/files/encounter/{enc.external_id}/{f.id}/"
+                docs.append({
+                    "resourceType": "DocumentReference",
+                    "id": str(f.id),
+                    "status": "current",
+                    "type": {
+                        "text": f.name
+                    },
+                    "subject": {
+                        "reference": f"Patient/{abha_id}"
+                    },
+                    "content": [
+                        {
+                            "attachment": {
+                                "url": url,
+                                "title": f.name,
+                                "contentType": "application/pdf"
+                            }
+                        }
+                    ]
+                })
+        return docs
+    except Exception as e:
+        print(f"Error fetching documents: {e}")
+        return []
+
 def create_sample_bundle(abha_id, patient_name="Demo Patient"):
     """
     Create a sample FHIR R5 bundle with realistic demo data.
@@ -231,7 +278,7 @@ def create_sample_bundle(abha_id, patient_name="Demo Patient"):
         create_medication_request("Amlodipine", 5, "once daily"),
     ]
 
-    all_resources = observations + [diagnostic_report] + conditions + medications
+    all_resources = observations + [diagnostic_report] + conditions + medications + get_document_references(abha_id)
 
     return create_fhir_bundle(
         patient_data={
@@ -365,6 +412,7 @@ def generate_devaganesh_bundle():
         + conditions
         + medications
         + [allergy]
+        + get_document_references("91-1234-5678-9012")
     )
 
     return create_fhir_bundle(
