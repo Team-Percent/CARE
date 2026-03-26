@@ -64,3 +64,11 @@ class MedGemmaRequestSerializer(serializers.Serializer):
         help_text="Optional preset to override the analysis prompt. "
                   "If not provided, the analysis_type determines the prompt.",
     )
+    patient_id = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        default="",
+        help_text="Patient ABHA ID (e.g. 91-1234-5678-9012) or patient UUID. "
+                  "When provided, the system pulls all patient files from MinIO "
+                  "and includes their content in the analysis.",
+    )

@@ -73,12 +73,12 @@ class PluginSettings:  # pragma: no cover
 
 DEFAULTS = {
     # MedGemma configuration
-    "MEDGEMMA_MOCK_MODE": True,
-    "MEDGEMMA_MODEL_VERSION": "medgemma-mock-1.0",
+    "MEDGEMMA_MOCK_MODE": False,
+    "MEDGEMMA_MODEL_VERSION": "medgemma-1.0",
     "MEDGEMMA_API_ENDPOINT": "",
     "MEDGEMMA_API_KEY": "",
     # Ollama local server configuration (for real MedGemma mode)
-    "MEDGEMMA_OLLAMA_HOST": "http://172.19.127.189:11434/api/chat",
+    "MEDGEMMA_OLLAMA_HOST": "http://10.85.92.115:11434/api/chat",
     "MEDGEMMA_OLLAMA_MODEL": "CareAnalyzer",
     "MEDGEMMA_REQUEST_TIMEOUT": 120,
     # FHIR configuration

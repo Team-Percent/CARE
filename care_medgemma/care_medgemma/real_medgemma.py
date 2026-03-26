@@ -235,7 +235,7 @@ def _parse_ai_response(raw_text, analysis_type):
     return result
 
 
-def analyze(analysis_type, input_data, preset=None):
+def analyze(analysis_type, input_data, preset=None, patient_files=None):
     """
     Run real MedGemma analysis via local Ollama server.
 
@@ -243,11 +243,14 @@ def analyze(analysis_type, input_data, preset=None):
         analysis_type: One of the AnalysisType choices
         input_data: Dict of patient clinical data
         preset: Optional preset override (comprehensive, summary, critical, timeline)
+        patient_files: Optional list of dicts from MinIO file pull:
+            [{filename, mime_type, text_content, is_image, base64_data}]
 
     Returns:
         Dict with structured analysis results (same schema as mock_medgemma)
     """
     start_time = time.time()
+    patient_files = patient_files or []
 
     # Determine which prompt to use
     prompt_key = preset or analysis_type
@@ -256,13 +259,44 @@ def analyze(analysis_type, input_data, preset=None):
     # Format patient data
     patient_text = _format_patient_data(input_data)
 
+    # Build patient info from enriched input_data
+    patient_info = input_data.get("patient_info", {})
+    if patient_info:
+        patient_text = (
+            f"Patient: {patient_info.get('name', 'Unknown')}, "
+            f"ABHA: {patient_info.get('abha_id', 'N/A')}, "
+            f"Gender: {patient_info.get('gender', 'N/A')}, "
+            f"DOB: {patient_info.get('date_of_birth', 'N/A')}, "
+            f"Blood Group: {patient_info.get('blood_group', 'N/A')}\n\n"
+            + patient_text
+        )
+
+    # Append all extracted file text contents
+    if patient_files:
+        file_texts = []
+        for i, pf in enumerate(patient_files):
+            if pf.get("text_content"):
+                file_texts.append(
+                    f"--- FILE {i+1}: {pf['filename']} ({pf['mime_type']}) ---\n"
+                    f"{pf['text_content']}\n"
+                    f"--- END FILE {i+1} ---\n"
+                )
+        if file_texts:
+            patient_text += (
+                f"\n\n=== PATIENT FILES ({len(file_texts)} documents) ===\n"
+                + "\n".join(file_texts)
+            )
+
     # Build message
     user_message = f"{system_prompt}\n\nPatient Data:\n{patient_text}"
+    
+    # Append the trigger command for the model to output structured format
+    user_message += "\n\ncareanalyze"
 
     # Build Ollama request
     ollama_host = getattr(
         plugin_settings, "MEDGEMMA_OLLAMA_HOST",
-        "http://172.19.127.189:11434/api/chat"
+        "http://10.42.0.1:11434/api/chat"
     )
     ollama_model = getattr(
         plugin_settings, "MEDGEMMA_OLLAMA_MODEL",
@@ -278,18 +312,23 @@ def analyze(analysis_type, input_data, preset=None):
         "messages": [
             {"role": "user", "content": user_message}
         ],
-        "stream": False,  # Non-streaming for API use
+        "stream": False,
     }
 
-    # Handle images if present
+    # Collect images: from input_data + from patient files
     images = input_data.get("images", []) if isinstance(input_data, dict) else []
+    for pf in patient_files:
+        if pf.get("is_image") and pf.get("base64_data"):
+            images.append(pf["base64_data"])
     if images:
         payload["messages"][0]["images"] = images
 
     try:
         logger.info(
-            "care_medgemma: Sending %s analysis to Ollama at %s (model: %s)",
-            analysis_type, ollama_host, ollama_model
+            "care_medgemma: Sending %s analysis to Ollama at %s "
+            "(model: %s, files: %d, images: %d)",
+            analysis_type, ollama_host, ollama_model,
+            len(patient_files), len(images)
         )
 
         response = requests.post(
@@ -311,31 +350,19 @@ def analyze(analysis_type, input_data, preset=None):
     except requests.exceptions.ConnectionError:
         logger.error(
             "care_medgemma: Cannot connect to Ollama at %s. "
-            "Falling back to mock analysis.", ollama_host
+            "Mock analysis is disabled. Returning error.", ollama_host
         )
-        from care_medgemma import mock_medgemma
-        result = mock_medgemma.analyze(analysis_type, input_data)
-        result["_fallback_reason"] = "ollama_connection_error"
-        result["is_mock"] = True
-        return result
+        raise Exception(f"Failed to connect to AI engine at {ollama_host}. Please ensure the MedGemma service is running.")
 
     except requests.exceptions.Timeout:
         logger.error(
             "care_medgemma: Ollama request timed out after %ds", request_timeout
         )
-        from care_medgemma import mock_medgemma
-        result = mock_medgemma.analyze(analysis_type, input_data)
-        result["_fallback_reason"] = "ollama_timeout"
-        result["is_mock"] = True
-        return result
+        raise Exception(f"AI analysis timed out after {request_timeout} seconds. The data might be too large or the model is overloaded.")
 
     except Exception as e:
         logger.error("care_medgemma: Ollama analysis failed: %s", str(e))
-        from care_medgemma import mock_medgemma
-        result = mock_medgemma.analyze(analysis_type, input_data)
-        result["_fallback_reason"] = f"ollama_error: {str(e)}"
-        result["is_mock"] = True
-        return result
+        raise Exception(f"AI analysis failed: {str(e)}")
 
     processing_time_ms = int((time.time() - start_time) * 1000)
 
@@ -348,5 +375,8 @@ def analyze(analysis_type, input_data, preset=None):
         "model_version": f"ollama-{ollama_model}",
         "processing_time_ms": processing_time_ms,
         "request_id": str(uuid.uuid4()),
-        "confidence": 0.0,  # Real model doesn't self-report confidence
+        "confidence": 0.0,
+        "files_analyzed": len(patient_files),
+        "images_processed": len(images),
     }
+

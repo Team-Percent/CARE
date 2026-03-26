@@ -16,6 +16,8 @@ requirements = [
     "django-environ",
     "django-filter",
     "celery",
+    "pypdf",
+    "requests",
 ]
 
 test_requirements = []
